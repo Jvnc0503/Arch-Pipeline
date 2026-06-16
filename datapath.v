@@ -7,13 +7,17 @@ module datapath(input  clk, reset,
                 output Zero,
                 output [31:0] PC,
                 input  [31:0] Instr,
+                // Signals exposed for pipeline registers (ID/EX)
+                output [31:0] SrcA,       // First operand from register file
+                output [31:0] ImmExt,     // Extended immediate value
+                // Outputs
                 output [31:0] ALUResult, WriteData, 
                 input  [31:0] ReadData);
   
   localparam WIDTH = 32; // Define a local parameter for bus width
 
   wire [31:0] PCNext, PCPlus4, PCTarget; 
-  wire [31:0] ImmExt; 
+  wire [31:0] ImmExt_int; // Internal signal for extend module output
   wire [31:0] SrcA, SrcB; 
   wire [31:0] Result; 
 
@@ -33,7 +37,7 @@ module datapath(input  clk, reset,
 
   adder       pcaddbranch(
     .a(PC), 
-    .b(ImmExt), 
+    .b(ImmExt_int), 
     .y(PCTarget)
   ); 
 
@@ -44,7 +48,7 @@ module datapath(input  clk, reset,
     .y(PCNext)
   ); 
  
-  // register file logic
+  // register file logic - expose rd1 and rd2 for pipeline
   regfile     rf(
     .clk(clk), 
     .we3(RegWrite), 
@@ -52,20 +56,23 @@ module datapath(input  clk, reset,
     .a2(Instr[24:20]), 
     .a3(Instr[11:7]), 
     .wd3(Result), 
-    .rd1(SrcA), 
-    .rd2(WriteData)
+    .rd1(SrcA),      // Exposed for ID/EX register
+    .rd2(WriteData)  // Also used as write address to regfile
   ); 
 
   extend      ext(
     .instr(Instr[31:7]), 
     .immsrc(ImmSrc), 
-    .immext(ImmExt)
-  ); 
+    .immext(ImmExt_int)  // Internal signal connected to extend module
+  );
+
+  // Assign internal ImmExt to output port for pipeline register
+  assign ImmExt = ImmExt_int;
 
   // ALU logic
   mux2 #(WIDTH)  srcbmux(
     .d0(WriteData), 
-    .d1(ImmExt), 
+    .d1(ImmExt_int), 
     .s(ALUSrc), 
     .y(SrcB)
   ); 
