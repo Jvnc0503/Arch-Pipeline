@@ -241,7 +241,86 @@ Fetch ----> Decode ----> Execute ----> Memory ----> Writeback
 
 ---
 
-## 16. Resumen rápido
+## 16. Cambios respecto a la versión inicial (SingleCycle)
+La versión inicial del repositorio, identificada por el commit `6aabd5f138e55e7bb053af556e24add481da6055`, corresponde a un procesador **RISC-V SingleCycle**. El diseño actual es una versión **pipeline** que modifica tanto la organización del datapath como el manejo de señales de control.
+
+### 16.1 Cambio de enfoque arquitectónico
+En la versión single-cycle:
+- cada instrucción se ejecuta completamente dentro de un mismo ciclo;
+- el datapath usa una ruta lógica simple para calcular el resultado y actualizar el PC;
+- no es necesario manejar dependencias entre instrucciones porque una instrucción finaliza antes de que la siguiente comience.
+
+En la versión pipeline:
+- una instrucción se divide en varias etapas que avanzan en paralelo;
+- distintas instrucciones pueden estar activas en diferentes puntos del mismo instante;
+- es necesario controlar cuándo una instrucción puede avanzar o debe detenerse.
+
+### 16.2 Sustitución del módulo principal
+La versión inicial usaba [riscvsingle.v](riscvsingle.v), mientras que la implementación actual usa [riscvpipe.v](riscvpipe.v).
+
+La diferencia conceptual es que:
+- `riscvsingle.v` conecta directamente el controlador con un datapath monociclo;
+- `riscvpipe.v` conecta el controlador, el datapath pipeline y la unidad de riesgos.
+
+### 16.3 Introducción de etapas separadas
+En el diseño original, todas las operaciones ocurrían en una sola ruta de ejecución. En la versión actual, el datapath se reorganizó para tener:
+- Fetch,
+- Decode,
+- Execute,
+- Memory,
+- Writeback.
+
+Esto exige la presencia de registros entre etapas, implementados en [pipereg.v](pipereg.v).
+
+### 16.4 Aparición de los registros intermedios
+En single-cycle no existían registros que conservaran instrucciones o señales entre etapas. En pipeline sí aparecen:
+- `IF/ID`,
+- `ID/EX`,
+- `EX/MEM`,
+- `MEM/WB`.
+
+Estos registros permiten que el procesador mantenga el estado correcto cuando varias instrucciones avanzan simultáneamente.
+
+### 16.5 Nuevo manejo de señales de control
+En la versión inicial, las señales de control se usaban directamente para ejecutar la instrucción actual.
+
+En la versión actual, muchas de esas señales se propagan a través de stages para que cada etapa use la información correcta de la instrucción correspondiente. Por ejemplo:
+- `ALUSrcD` y `ALUControlD` se mantienen hasta Execute;
+- `MemWriteD` se conserva hasta Memory;
+- `ResultSrcD` se mantiene hasta Writeback.
+
+### 16.6 Adición de la unidad de riesgos
+Este es probablemente el cambio más importante.
+
+En el diseño single-cycle no había riesgo de datos entre instrucciones porque la siguiente instrucción no comenzaba hasta que la anterior terminaba. En pipeline sí aparece el problema de dependencias, por lo que se añadió [hazard.v](hazard.v).
+
+La unidad de riesgos ahora decide:
+- forwarding (`ForwardAE`, `ForwardBE`),
+- stalls (`StallF`, `StallD`),
+- flush (`FlushE`).
+
+### 16.7 Modificación del control del PC
+En single-cycle, el PC se actualiza según la instrucción actual.
+
+En pipeline, el PC debe manejar correctamente:
+- avance normal (`PC + 4`),
+- branch/salto calculado en Execute,
+- detenciones temporales para evitar usar datos incorrectos.
+
+Por eso aparecen muxes adicionales como `pcmux` y `pcstallmux` en el datapath.
+
+### 16.8 Impacto práctico de la migración
+La transición de single-cycle a pipeline implica:
+- mayor complejidad lógica,
+- necesidad de sincronización entre etapas,
+- manejo explícito de dependencias,
+- mejor aprovechamiento del reloj para ejecutar instrucciones en serie con mayor rendimiento promedio.
+
+En otras palabras: el diseño inicial ejecuta una instrucción completa antes de pasar a la siguiente, mientras que el diseño actual permite que varias instrucciones se superpongan en el tiempo.
+
+---
+
+## 17. Resumen rápido
 En pocas palabras:
 - el PC lleva la dirección de la siguiente instrucción;
 - el controlador decide cómo ejecutar cada instrucción;
