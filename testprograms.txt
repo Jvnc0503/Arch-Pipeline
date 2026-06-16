@@ -1,0 +1,69 @@
+PROGRAMA 1: Sin dependencias
+addi x2, x0, 5      # x2 = 5
+addi x0, x0, 0      # NOP (Espacio para evitar dependencia)
+addi x0, x0, 0      # NOP
+addi x0, x0, 0      # NOP
+addi x3, x0, 10     # x3 = 10
+addi x0, x0, 0      # NOP
+addi x0, x0, 0      # NOP
+addi x0, x0, 0      # NOP
+add  x4, x2, x3     # x4 = 15 (Los registros x2 y x3 ya pasaron por Writeback hace rato)
+addi x0, x0, 0      # NOP
+addi x0, x0, 0      # NOP
+addi x0, x0, 0      # NOP
+sw   x4, 100(x0)    # Guardamos el 15 en la dirección 100 de la RAM
+
+00500113
+00000013
+00000013
+00000013
+00a00193
+00000013
+00000013
+00000013
+00310233
+00000013
+00000013
+00000013
+06402223
+
+PROGRAMA 2: Forwarding
+
+addi x2, x0, 5
+addi x3, x0, 10
+add x4, x2, x3
+sw x4, 100(x0)
+
+00500113
+00a00193
+00310233
+06402223
+
+PROGRAMA 3: Stall
+
+addi x2, x0, 15
+sw x2, 0(x0)
+lw x3, 0(x0)
+addi x4, x3, 0
+sw x4, 100(x0)
+
+00f00113
+00202023
+00002183
+00018213
+06402223
+
+PROGRAMA 4: Flushing
+
+addi x4, x0, 15
+jal x0, 12
+addi x4, x0, 99
+addi x4, x0, 88
+sw x4, 100(x0)
+
+00f00213
+00c0006f
+06300213
+05800213
+06402223
+
