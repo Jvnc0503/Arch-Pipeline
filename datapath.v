@@ -1,38 +1,33 @@
 module datapath(
-    input  clk, reset,
+    input  wire        clk, reset,
     
-    // Señales de control que vienen del controller (nacen en Decode)
-    input  [1:0] ResultSrcD, 
-    input  PCSrcD, ALUSrcD, RegWriteD, MemWriteD, JumpD, BranchD,
-    input  [1:0] ImmSrcD, 
-    input  [2:0] ALUControlD,
+    input  wire [1:0]  ResultSrcD, 
+    input  wire        PCSrcD, ALUSrcD, RegWriteD, MemWriteD, JumpD, BranchD, JalrD,
+    input  wire [2:0]  ImmSrcD, 
+    input  wire [3:0]  ALUControlD,
     
-    // Entradas y Salidas de la Memoria de Instrucciones (Etapa F)
-    output [31:0] PCF,
-    input  [31:0] InstrF,
+    output wire [31:0] PCF,
+    input  wire [31:0] InstrF,
     output wire [31:0] InstrD,
     
-    // Entradas y Salidas de la Memoria de Datos (Etapa M)
-    output [31:0] ALUResultM, WriteDataM, 
-    input  [31:0] ReadDataM,
-    output reg MemWriteM, // Esta señal viajó desde D hasta M
+    output wire [31:0] ALUResultM, WriteDataM, 
+    input  wire [31:0] ReadDataM,
+    output reg         MemWriteM,
     
-    // Inputs que vienen de la Hazard Unit
-    input wire [1:0] ForwardAE, ForwardBE,
-    input wire StallF, StallD, FlushE,
+    input  wire [1:0]  ForwardAE, ForwardBE,
+    input  wire        StallF, StallD, FlushE,
     
-    // Outputs que van hacia la Hazard Unit para que pueda calcular los riesgos
     output wire [4:0]  Rs1D_, Rs2D_,
     output reg  [4:0]  Rs1E, Rs2E, RdE,
     output reg  [4:0]  RdM, RdW,
     output reg         RegWriteM, RegWriteW,
-    output wire        ResultSrcE0, // Bit 0 de ResultSrcE para detectar 'lw'
-    output wire        PCSrcE
+    output wire        ResultSrcE0, 
+    output wire        PCSrcE 
 );
   
   //Etapa de Fetch
   wire [31:0] PCNextF, PCPlus4F, PCInputF;
-  wire [31:0] PCTargetE;  // Viene desde Execute
+  wire [31:0] PCTargetE;  
   
   mux2 #(32)  pcmux(.d0(PCPlus4F), .d1(PCTargetE), .s(PCSrcE), .y(PCNextF));
   mux2 #(32)  pcstallmux(.d0(PCNextF), .d1(PCF), .s(StallF), .y(PCInputF));
@@ -41,7 +36,6 @@ module datapath(
   
   // MURO IF / ID 
   wire [31:0] PCD, PCPlus4D;
-  
   pipereg r_if_id_instr (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(InstrF),   .q(InstrD));
   pipereg r_if_id_pc    (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(PCF),      .q(PCD));
   pipereg r_if_id_pc4   (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(PCPlus4F), .q(PCPlus4D));
@@ -51,54 +45,50 @@ module datapath(
   wire [4:0]  Rs1D = InstrD[19:15];
   wire [4:0]  Rs2D = InstrD[24:20];
   wire [4:0]  RdD  = InstrD[11:7];
+  wire [2:0]  funct3D = InstrD[14:12];
   
   assign Rs1D_ = Rs1D;
   assign Rs2D_ = Rs2D;
+  
   wire [31:0] ResultW;
   
-  regfile rf(.clk(clk), .we3(RegWriteW), .a1(Rs1D), .a2(Rs2D), .a3(RdW), .wd3(ResultW), .rd1(RD1D), .rd2(RD2D));  
-  // Extensión de Signo
+  regfile rf(.clk(clk), .we3(RegWriteW), .a1(Rs1D), .a2(Rs2D), .a3(RdW), .wd3(ResultW), .rd1(RD1D), .rd2(RD2D));
   extend ext(.instr(InstrD[31:7]), .immsrc(ImmSrcD), .immext(ImmExtD));
   
   //ID / EX
-  // Datos
   wire [31:0] RD1E, RD2E, PCE, ImmExtE, PCPlus4E;
-  
   pipereg r_id_ex_rd1 (.clk(clk), .reset(reset), .en(1'b1), .clr(FlushE), .d(RD1D),     .q(RD1E));
   pipereg r_id_ex_rd2 (.clk(clk), .reset(reset), .en(1'b1), .clr(FlushE), .d(RD2D),     .q(RD2E));
   pipereg r_id_ex_imm (.clk(clk), .reset(reset), .en(1'b1), .clr(FlushE), .d(ImmExtD),  .q(ImmExtE));
   pipereg r_id_ex_pc  (.clk(clk), .reset(reset), .en(1'b1), .clr(FlushE), .d(PCD),      .q(PCE));
   pipereg r_id_ex_pc4 (.clk(clk), .reset(reset), .en(1'b1), .clr(FlushE), .d(PCPlus4D), .q(PCPlus4E));
   
-  // Direcciones y Señales de Control
-  reg       RegWriteE, MemWriteE, JumpE, BranchE, ALUSrcE;
+  reg       RegWriteE, MemWriteE, JumpE, BranchE, ALUSrcE, JalrE;
   reg [1:0] ResultSrcE;
-  reg [2:0] ALUControlE;
+  reg [3:0] ALUControlE;
+  reg [2:0] funct3E;
   
   always @(posedge clk or posedge reset) begin
         if (reset | FlushE) begin 
-            RegWriteE   <= 0; MemWriteE   <= 0; JumpE <= 0; BranchE <= 0; ALUSrcE <= 0;
-            ResultSrcE  <= 0; ALUControlE <= 0;
+            RegWriteE <= 0; MemWriteE <= 0; JumpE <= 0; BranchE <= 0; ALUSrcE <= 0; JalrE <= 0;
+            ResultSrcE <= 0; ALUControlE <= 0; funct3E <= 0;
             Rs1E <= 0; Rs2E <= 0; RdE <= 0;
         end else begin
-            RegWriteE   <= RegWriteD;
-            MemWriteE   <= MemWriteD;
-            JumpE       <= JumpD;
-            BranchE     <= BranchD;
-            ALUSrcE     <= ALUSrcD;
-            ResultSrcE  <= ResultSrcD;
-            ALUControlE <= ALUControlD;
-            Rs1E        <= Rs1D;
-            Rs2E        <= Rs2D;
+            RegWriteE   <= RegWriteD;  MemWriteE   <= MemWriteD;
+            JumpE       <= JumpD;      BranchE     <= BranchD;
+            ALUSrcE     <= ALUSrcD;    JalrE       <= JalrD;
+            ResultSrcE  <= ResultSrcD; ALUControlE <= ALUControlD;
+            funct3E     <= funct3D;
+            Rs1E        <= Rs1D;       Rs2E        <= Rs2D;
             RdE         <= RdD;
         end
     end
     
    // EXECUTE
    
-   wire [31:0] SrcAE, WriteDataE;
-   wire [31:0] SrcBE, ALUResultE;
-   wire ZeroE;
+   // ¡CORREGIDO! Se agregó ALUResultE aquí para que sea de 32 bits
+   wire [31:0] SrcAE, WriteDataE, SrcBE, ALUResultE;
+   wire        ZeroE, LtE;
    
    // Seteamos el detector de 'lw' para la Hazard Unit
    assign ResultSrcE0 = ResultSrcE[0];
@@ -110,29 +100,43 @@ module datapath(
    mux2 #(32) srcbmux(.d0(WriteDataE), .d1(ImmExtE), .s(ALUSrcE), .y(SrcBE));
    
    // La ALU procesa el operando A adelantado
-   alu  alu(.a(SrcAE), .b(SrcBE), .alucontrol(ALUControlE), .result(ALUResultE), .zero(ZeroE));
-   adder pcaddbranch(.a(PCE), .b(ImmExtE), .y(PCTargetE));
-   assign PCSrcE = (BranchE & ZeroE) | JumpE;
+   alu alu(.a(SrcAE), .b(SrcBE), .alucontrol(ALUControlE), .result(ALUResultE), .zero(ZeroE), .lt(LtE));
+   
+   // EVALUADOR MULTI-BRANCH
+   reg TakeBranchE;
+   always @* case(funct3E)
+       3'b000:  TakeBranchE = ZeroE;       // beq
+       3'b001:  TakeBranchE = ~ZeroE;      // bne
+       3'b100:  TakeBranchE = LtE;         // blt
+       3'b101:  TakeBranchE = ~LtE;        // bge
+       default: TakeBranchE = 1'b0;
+   endcase
+
+   wire [31:0] PCBranchE;
+   adder pcaddbranch(.a(PCE), .b(ImmExtE), .y(PCBranchE));
+
+   // Si es jalr -> Usa el ALUResult (Rs1 + Imm) limpiando el bit 0. Si no, usa PC + Imm
+   assign PCTargetE = JalrE ? {ALUResultE[31:1], 1'b0} : PCBranchE;
+   assign PCSrcE = (BranchE & TakeBranchE) | JumpE;
    
    // EX / MEM
    
    wire [31:0] PCPlus4M;
-   pipereg r_ex_mem_alu(.clk(clk), .reset(reset), .en(1'b1), .clr(1'b0), .d(ALUResultE),  .q(ALUResultM));
+   pipereg r_ex_mem_alu(.clk(clk), .reset(reset), .en(1'b1), .clr(1'b0), .d(ALUResultE), .q(ALUResultM));
    pipereg r_ex_mem_wd (.clk(clk), .reset(reset), .en(1'b1), .clr(1'b0), .d(WriteDataE), .q(WriteDataM));
-   pipereg r_ex_mem_pc4(.clk(clk), .reset(reset), .en(1'b1), .clr(1'b0), .d(PCPlus4E),   .q(PCPlus4M));
    
+   // ¡CORREGIDO! Se cerró correctamente el paréntesis y el punto y coma de esta línea
+   pipereg r_ex_mem_pc4(.clk(clk), .reset(reset), .en(1'b1), .clr(1'b0), .d(PCPlus4E),   .q(PCPlus4M));
    
    // Direcciones y Señales de Control
    reg [1:0] ResultSrcM;
 
    always @(posedge clk or posedge reset) begin
        if (reset) begin
-           RegWriteM  <= 0; MemWriteM  <= 0; ResultSrcM <= 0; RdM <= 0;
+           RegWriteM <= 0; MemWriteM <= 0; ResultSrcM <= 0; RdM <= 0;
        end else begin
-           RegWriteM  <= RegWriteE;
-           MemWriteM  <= MemWriteE; 
-           ResultSrcM <= ResultSrcE;
-           RdM        <= RdE;
+           RegWriteM <= RegWriteE; MemWriteM <= MemWriteE; 
+           ResultSrcM <= ResultSrcE; RdM <= RdE;
        end
     end
     
@@ -146,14 +150,13 @@ module datapath(
    reg [1:0] ResultSrcW;
    always @(posedge clk or posedge reset) begin
         if (reset) begin
-            RegWriteW  <= 0; ResultSrcW <= 0; RdW <= 0;
+            RegWriteW <= 0; ResultSrcW <= 0; RdW <= 0;
         end else begin
-            RegWriteW  <= RegWriteM;
-            ResultSrcW <= ResultSrcM;
-            RdW        <= RdM;
+            RegWriteW <= RegWriteM; ResultSrcW <= ResultSrcM; RdW <= RdM;
         end
     end
     
-    // WRITEBACK
+   // WRITEBACK
    mux3 #(32) resultmux(.d0(ALUResultW), .d1(ReadDataW), .d2(PCPlus4W), .s(ResultSrcW), .y(ResultW));
- endmodule
+
+endmodule

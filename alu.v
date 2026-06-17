@@ -1,33 +1,23 @@
-module alu(input  [31:0] a, b,
-           input  [2:0]  alucontrol,
-           output [31:0] result,
-           output zero);
-  
-  wire [31:0] condinvb, sum; 
-  wire        v; // overflow
-  wire        isAddSub; 
-
-  reg [31:0] result_reg; 
-  assign result = result_reg;
-
-  assign condinvb = alucontrol[0] ? ~b : b; 
-  assign sum = a + condinvb + alucontrol[0]; 
-  assign isAddSub = ~alucontrol[2] & ~alucontrol[1] |
-                    ~alucontrol[1] & alucontrol[0]; 
-
-  always @* case (alucontrol)
-      3'b000:  result_reg = sum; // add
-      3'b001:  result_reg = sum; // subtract
-      3'b010:  result_reg = a & b; // and
-      3'b011:  result_reg = a | b; // or
-      3'b100:  result_reg = a ^ b; // xor
-      3'b101:  result_reg = sum[31] ^ v; // slt
-      3'b110:  result_reg = a << b[4:0]; // sll
-      3'b111:  result_reg = a >> b[4:0]; // srl
-      default: result_reg = 32'bx;
+module alu(
+    input  wire [31:0] a, b,
+    input  wire [3:0]  alucontrol,
+    output reg  [31:0] result,
+    output wire        zero,
+    output wire        lt   // Less Than (para blt y bge)
+);
+    always @* case(alucontrol)
+        4'b0000: result = a + b;                   // add
+        4'b0001: result = a - b;                   // sub
+        4'b0010: result = a & b;                   // and
+        4'b0011: result = a | b;                   // or
+        4'b0100: result = a ^ b;                   // xor
+        4'b0101: result = a << b[4:0];             // sll
+        4'b0110: result = a >> b[4:0];             // srl
+        4'b0111: result = $signed(a) >>> b[4:0];   // sra (aritmético)
+        4'b1000: result = b;                       // pass B 
+        default: result = 32'bx;
     endcase
-
-  assign zero = (result == 32'b0); 
-  assign v = ~(alucontrol[0] ^ a[31] ^ b[31]) & (a[31] ^ sum[31]) & isAddSub; 
-  
+    
+    assign zero = (result == 32'b0);
+    assign lt   = ($signed(a) < $signed(b));
 endmodule

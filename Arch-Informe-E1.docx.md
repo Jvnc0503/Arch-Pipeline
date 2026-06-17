@@ -1,4 +1,4 @@
- 			Proyecto de Arquitectura de Computadoras  
+ 			Arquitectura de Computadoras — Proyecto 2  
  
 
 **Implementación de la extensión Atomic de Risc-v en un procesador pipeline**
@@ -131,12 +131,30 @@ Estas señales se transmiten a lo largo del pipeline junto con los datos a trav�
 
 | Instrucción | Formato | Operación principal | Uso en el proyecto |
 | :---- | :---- | :---- | :---- |
-| `addi` | I-type | Suma inmediata | Inicialización de registros y pruebas de datos |
-| `add` | R-type | Suma de registros | Validación de forwarding y ejecución aritmética |
 | `lw` | I-type | Carga desde memoria | Prueba de stall por dependencia de datos |
-| `sw` | S-type | Almacenamiento a memoria | Verificación final del resultado en la memoria |
-| `jal` | J-type | Salto incondicional | Prueba de flushing |
+| `addi` | I-type | Suma inmediata | Inicialización de registros y pruebas de datos |
+| `slli` | I-type | Shift izquierdo lógico inmediato | Verificación de operaciones de desplazamiento con inmediatos |
+| `xori` | I-type | Xor inmediato | Validación de operaciones lógicas con inmediatos |
+| `srli` | I-type | Shift derecho lógico inmediato | Verificación de desplazamiento lógico hacia la derecha  |
+| `srai` | I-type | Shift derecho aritmético inmediato | Verificación del manejo correcto del bit de signo  |
+| `ori` | I-type | Or inmediato | Validación de operaciones lógicas con inmediatos  |
+| `andi` | I-type | And inmediato | Validación de operaciones lógicas con inmediatos  |
+| `add` | R-type | Suma de registros | Validación de forwarding y ejecución aritmética |
+| `sub` | R-type | Resta de registros  | Verificación de operaciones aritméticas y comparaciones  |
+| `sll` | R-type | Shift izquierdo lógico | Verificación de desplazamiento usando registros  |
+| `xor` | R-type | Xor entre registros | Validación de operaciones lógicas entre registros  |
+| `srl` | R-type | Shift derecho lógico | Verificación de desplazamiento lógico usando registros  |
+| `sra` | R-type | Shift derecho aritmético | Verificación de extensión de signo en desplazamientos  |
+| `or` | R-type | Or entre registros | Validación de operaciones lógicas entre registros  |
+| `and` | R-type | And entre registros | Validación de operaciones lógicas entre registros  |
+| `lui` | U-type | Cargar en el intermedio superior | Inicialización eficiente de constantes de 32 bits |
 | `beq` | B-type | Comparación y salto condicional | Soporte para control de flujo |
+| `bne` | B-type | Salto si no es igual  | Verificación de comparaciones  |
+| `blt` | B-type | Salto si es menor que | Verificación de comparaciones con signo |
+| `bge` | B-type | Salto si es mayor o igual que | Verificación de comparaciones con signo |
+| `sw` | S-type | Almacenamiento a memoria | Verificación final del resultado en la memoria |
+| `jalr` | I-type | Salto incondicional con registro | Verificación de saltos indirectos  |
+| `jal` | J-type | Salto incondicional | Prueba de flushing |
 
       
 
