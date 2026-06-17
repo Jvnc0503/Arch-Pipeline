@@ -26,19 +26,31 @@ module datapath(
 );
   
   //Etapa de Fetch
-  wire [31:0] PCNextF, PCPlus4F, PCInputF;
-  wire [31:0] PCTargetE;  
-  
-  mux2 #(32)  pcmux(.d0(PCPlus4F), .d1(PCTargetE), .s(PCSrcE), .y(PCNextF));
+  wire [31:0] PCNextF, PCPlus4F, PCPlus2F, PCStepF, PCInputF;
+  wire [31:0] PCTargetE;
+  wire        IsCompressedF;
+  wire [31:0] InstrFDec;
+
+  decompressor dc(
+      .instr(InstrF),
+      .pc(PCF),
+      .instr32(InstrFDec),
+      .isCompressed(IsCompressedF),
+      .pcstep(PCStepF)
+  );
+
+  adder       pcadd2(.a(PCF), .b(32'd2), .y(PCPlus2F));
+  adder       pcadd4(.a(PCF), .b(32'd4), .y(PCPlus4F));
+  mux2 #(32)  pcstepmux(.d0(PCPlus4F), .d1(PCPlus2F), .s(IsCompressedF), .y(PCStepF));
+  mux2 #(32)  pcmux(.d0(PCStepF), .d1(PCTargetE), .s(PCSrcE), .y(PCNextF));
   mux2 #(32)  pcstallmux(.d0(PCNextF), .d1(PCF), .s(StallF), .y(PCInputF));
   flopr #(32) pcreg(.clk(clk), .reset(reset), .d(PCInputF), .q(PCF));
-  adder       pcadd4(.a(PCF), .b(32'd4), .y(PCPlus4F));
-  
+
   // MURO IF / ID 
   wire [31:0] PCD, PCPlus4D;
-  pipereg r_if_id_instr (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(InstrF),   .q(InstrD));
-  pipereg r_if_id_pc    (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(PCF),      .q(PCD));
-  pipereg r_if_id_pc4   (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(PCPlus4F), .q(PCPlus4D));
+  pipereg r_if_id_instr (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(InstrFDec), .q(InstrD));
+  pipereg r_if_id_pc    (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(PCF),       .q(PCD));
+  pipereg r_if_id_pc4   (.clk(clk), .reset(reset), .en(~StallD), .clr(PCSrcE), .d(PCPlus4F),  .q(PCPlus4D));
   
   //Decode
   wire [31:0] RD1D, RD2D, ImmExtD;
