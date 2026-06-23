@@ -1,0 +1,6 @@
+05814529 // [c.li a1, 0]     | [c.li a0, 10]   -> Inicialización de registros base
+06094601 // [c.li a2, 2]     | [c.li a1, 2]    -> Dimensiones de la matriz (2x2)
+c50c1502 // [c.add a0, a1]   | [c.sw a1, 0(a0)]-> Almacenamiento rápido usando RVC
+8d099622 // [c.mv a2, a0]    | [c.sub a0, a1]  
+051dc105 // [c.srai a0, 1]   | [c.beqz a1, +4] -> Bucle optimizado con saltos comprimidos
+0ca02423 // sw a0, 200(x0)                     -> GUARDA RESULTADO Y TERMINA

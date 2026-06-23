@@ -1,0 +1,6 @@
+08000113 // addi sp, x0, 128   -> (32 bits) Inicialización obligatoria del Stack Pointer
+71794505 // [c.addi16sp -16] | [c.li a0, 1]    -> Inicia raíz y reserva espacio en pila
+451da52e // [c.add a0, a1]   | [c.lwsp a0, 8]  -> Recorrido de subárboles leyendo de la pila
+c40ae40a // [c.lwsp a1, 8]   | [c.swsp a0, 8]  -> Guarda estados del nodo actual
+00014581 // [c.nop]          | [c.li a1, 0]    -> Final del camino del nodo (Hoja del árbol)
+0ca02423 // sw a0, 200(x0)                     -> GUARDA Y TERMINA
