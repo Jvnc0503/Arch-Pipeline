@@ -2,9 +2,17 @@ module imem(
     input  wire [31:0] a,
     output wire [31:0] rd
 );
-    reg [31:0] RAM[0:255]; 
+    reg [31:0] RAM[0:511]; 
+    integer i;
+
     initial begin
-        $readmemh("riscvtest.mem", RAM);
+        // Limpiar la memoria para evitar las 'X'
+        for (i = 0; i < 512; i = i + 1) begin
+            RAM[i] = 32'h00000013; // Llenar con NOPs
+        end
+        
+        // Cargar el archivo maestro de pruebas
+        $readmemh("riscv_test.mem", RAM);
     end
     
     wire [29:0] word_addr = a[31:2]; 

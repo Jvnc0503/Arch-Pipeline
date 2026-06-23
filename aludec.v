@@ -1,5 +1,5 @@
 module aludec(
-    input  wire [5:0] opb5, 
+    input  wire       opb5,
     input  wire [2:0] funct3,
     input  wire       funct7b5, 
     input  wire [1:0] ALUOp,
