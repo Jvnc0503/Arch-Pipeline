@@ -1,7 +1,0 @@
-00000613 // addi a2, x0, 0     (Inicia acumulador)
-00058663 // loop: beq a1, x0, end (Si multiplicador es 0, termina)
-00a60633 // add a2, a2, a0     (Suma iterativa)
-fff58593 // addi a1, a1, -1    (Resta 1 al multiplicador)
-fe1ff06f // jal x0, loop       (Vuelve a iterar)
-00060533 // end: add a0, a2, x0 (Mueve resultado para guardar)
-0ca02423 // sw a0, 200(x0)     (STOP UNIVERSAL: Guarda en 200)

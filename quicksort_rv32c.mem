@@ -1,6 +1,0 @@
-458d4515 // [c.li a1, 3]     | [c.li a0, 5]
-00b55463 // bge a0, a1, skip (32-bit branch)
-85aa862a // [c.mv a0, a1]    | [c.mv a2, a0]
-000185e6 // [c.nop]          | [c.mv a1, a2]
-952e0001 // [c.add a0, a1]   | [skip: c.nop]
-0ca02423 // sw a0, 200(x0)   (STOP UNIVERSAL)
