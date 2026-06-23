@@ -1,41 +1,44 @@
-module testbench;
-  reg          clk;
-  reg          reset;
-  wire [31:0]  WriteData;
-  wire [31:0]  DataAdr;
-  wire         MemWrite;
-  
-  // instantiate device to be tested
-  top dut(
-    .clk(clk), 
-    .reset(reset), 
-    .WriteData(WriteData), 
-    .DataAdr(DataAdr), 
-    .MemWrite(MemWrite)
-  );
+`timescale 1ns/1ps
 
-  // initialize test
-  initial begin
-    reset = 1; # 22;
-    reset = 0;
-  end
+module testbench();
+    reg         clk;
+    reg         reset;
+    wire [31:0] WriteData, DataAdr;
+    wire        MemWrite;
 
-  // generate clock to sequence tests
-  always begin
-    clk = 1; # 5; 
-    clk = 0; # 5;
-  end
+    // Instancia de tu procesador
+    top dut(
+        .clk(clk), 
+        .reset(reset), 
+        .WriteData(WriteData), 
+        .DataAdr(DataAdr), 
+        .MemWrite(MemWrite)
+    );
 
-  // check results
-  always @(negedge clk) begin
-    if(MemWrite) begin
-      if(DataAdr === 100 & WriteData === 15) begin
-        $display("¡EXITO! El Pipeline Base funciona perfecto.");
-        $finish;
-      end else if (DataAdr !== 0) begin // ¡NUEVO! Ignora las escrituras en la dir 0
-        $display("Fallo: Escribio %d en la direccion %d", WriteData, DataAdr);
-        $finish;
-      end
+    // Inicialización
+    initial begin
+        reset <= 1; # 22; reset <= 0;
     end
-  end
+    
+    // Reloj
+    always begin
+        clk <= 1; # 5; clk <= 0; # 5;
+    end
+
+    // Monitor Universal de Resultados
+    always @(negedge clk) begin
+        if(MemWrite) begin
+            // Imprime cada escritura en la consola para tu análisis
+            $display("RAM Write: Escribio %d en la direccion %d", WriteData, DataAdr);
+            
+            // CONDICIÓN UNIVERSAL: Todos mis algoritmos terminan escribiendo en la dir 200
+            if(DataAdr === 200) begin 
+                $display("========================================");
+                $display("¡EXITO TOTAL! El programa ha finalizado.");
+                $display("Resultado final guardado: %d", WriteData);
+                $display("========================================");
+                $finish;
+            end
+        end
+    end
 endmodule

@@ -1,0 +1,9 @@
+00500513 // addi a0, x0, 5
+00300593 // addi a1, x0, 3
+00b55663 // bge a0, a1, skip (compara para ordenar)
+00050633 // add a2, a0, x0   (swap temp)
+00058533 // add a0, a1, x0
+000605b3 // add a1, a2, x0
+00050513 // skip: addi a0, a0, 0
+00a58533 // add a0, a1, a0   (suma de comprobacion)
+0ca02423 // sw a0, 200(x0)   (STOP UNIVERSAL: Guarda en 200)

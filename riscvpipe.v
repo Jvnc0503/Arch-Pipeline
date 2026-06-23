@@ -47,7 +47,6 @@ module riscvpipe(
         .JalrD      (JalrD),
         .ImmSrcD    (ImmSrcD), 
         .ALUControlD(ALUControlD),
-        
         .PCF        (PCF),
         .InstrF     (InstrF),
         .InstrD     (InstrD),        
@@ -55,7 +54,6 @@ module riscvpipe(
         .WriteDataM (WriteDataM), 
         .ReadDataM  (ReadDataM),
         .MemWriteM  (MemWriteM),
-        
         .ForwardAE  (ForwardAE), 
         .ForwardBE  (ForwardBE),
         .StallF     (StallF), 

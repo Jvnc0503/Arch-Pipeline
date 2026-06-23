@@ -3,14 +3,9 @@ module controller(
     input  wire [2:0] funct3,
     input  wire       funct7b5,
     output wire [1:0] ResultSrc, 
-    output wire       MemWrite,
-    output wire       ALUSrc,      
-    output wire       RegWrite, 
-    output wire       Jump,
-    output wire       Jalr,        
+    output wire       MemWrite, ALUSrc, RegWrite, Jump, Jalr, Branch,     
     output wire [2:0] ImmSrc, 
-    output wire [3:0] ALUControl,
-    output wire       Branch       
+    output wire [3:0] ALUControl       
 );
     wire [1:0] ALUOp; 
     

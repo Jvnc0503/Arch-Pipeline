@@ -1,0 +1,5 @@
+c9814601 // [c.beqz a1, end] | [c.li a2, 0]
+15fd962a // [c.addi a1, -1]  | [c.add a2, a0]
+0001bfd5 // [c.nop] (pad)    | [c.j loop]
+00060533 // add a0, a2, x0   (Instruccion de 32 bits normal)
+0ca02423 // sw a0, 200(x0)   (STOP UNIVERSAL: Guarda en 200)

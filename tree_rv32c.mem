@@ -1,0 +1,7 @@
+7179c105 // [c.addi16sp -16] | [c.beqz a0, end]
+e40ad606 // [c.swsp a0, 8]   | [c.swsp ra, 12]
+452240b2 // [c.lwsp a0, 8]   | [c.lwsp ra, 12]
+a0056141 // [c.j end]        | [c.addi16sp 16]
+00014501 // [c.nop]          | [c.li a0, 0]
+05050001 // [c.addi a0, 1]   | [end: c.nop]
+0ca02423 // sw a0, 200(x0)   (STOP UNIVERSAL)

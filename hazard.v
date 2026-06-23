@@ -14,14 +14,14 @@ module hazard(
     // Forwarding
     always @* begin
         // Operando A
-        if (((Rs1E == RdM) & RegWriteM) & (Rs1E != 0))      ForwardAE = 2'b10; // Adelanta desde Memory
-        else if (((Rs1E == RdW) & RegWriteW) & (Rs1E != 0)) ForwardAE = 2'b01; // Adelanta desde Writeback
-        else                                                ForwardAE = 2'b00; // Usa el valor normal del RegFile
+        if (((Rs1E == RdM) & RegWriteM) & (Rs1E != 0))      ForwardAE = 2'b10; 
+        else if (((Rs1E == RdW) & RegWriteW) & (Rs1E != 0)) ForwardAE = 2'b01; 
+        else                                                ForwardAE = 2'b00; 
 
         // Operando B
-        if (((Rs2E == RdM) & RegWriteM) & (Rs2E != 0))      ForwardBE = 2'b10; // Adelanta desde Memory
-        else if (((Rs2E == RdW) & RegWriteW) & (Rs2E != 0)) ForwardBE = 2'b01; // Adelanta desde Writeback
-        else                                                ForwardBE = 2'b00; // Usa el valor normal
+        if (((Rs2E == RdM) & RegWriteM) & (Rs2E != 0))      ForwardBE = 2'b10; 
+        else if (((Rs2E == RdW) & RegWriteW) & (Rs2E != 0)) ForwardBE = 2'b01; 
+        else                                                ForwardBE = 2'b00; 
     end
 
     // Stall
