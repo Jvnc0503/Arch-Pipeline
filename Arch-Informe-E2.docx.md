@@ -47,49 +47,29 @@ Carlos Williams
 
 [c.add	8](#c.add)
 
-[c.sub	8](#c.sub,-c.xor,-c.or,-c.and)
+[c.sub, c.xor, c.or, c.and	9](#c.sub,-c.xor,-c.or,-c.and)
 
-[e c.and	8](#heading=h.tbhh1woysind)
+[c.slli	10](#c.slli)
 
-[c.or	8](#heading=h.9kigebduywc1)
+[c.srli, c.srai	11](#c.srli,-c.srai)
 
-[c.xor	8](#heading=h.nr149nxrioi3)
+[c.lui	11](#c.lui)
 
-[c.slli	8](#c.slli)
+[**2\. Resultados	12**](#2.-resultados)
 
-[c.srli	8](#c.srli,-c.srai)
+[2.1 Programa ISA	12](#2.1-programa-isa)
 
-[c.srai	8](#heading=h.dd4lbtm7uffu)
+[**2.2 Validación de cada una de las instrucciones	14**](#2.2-validación-de-cada-una-de-las-instrucciones)
 
-[c.lui	8](#c.lui)
+[Validacion de Prueba Aritmética (c.addi, c.add, c.sub):	14](#validacion-de-prueba-aritmética-\(c.addi,-c.add,-c.sub\):)
 
-[**2\. Resultados	8**](#2.-resultados)
+[Validacion  de Prueba Logica  (c.and, c.or):	15](#validacion-de-prueba-logica-\(c.and,-c.or\):)
 
-[2.1 Programa ISA	8](#2.1-programa-isa)
+[Validación Prueba de Desplazamientos y XOR:	16](#validación-prueba-de-desplazamientos-y-xor:)
 
-[**2.2 Validación de cada una de las instrucciones	8**](#2.2-validación-de-cada-una-de-las-instrucciones)
+[Validación Prueba LUI y General:	16](#validación-prueba-lui-y-general:)
 
-[Prueba de c.addi	8](#validacion-de-prueba-aritmética-\(c.addi,-c.add,-c.sub\):)
-
-[Prueba de c.add	9](#heading=h.p30f5lj5ka4k)
-
-[Prueba de c.sub	10](#heading=h.bfubk7rtxd0w)
-
-[Prueba de c.and	10](#heading=h.316hp6mqlh9)
-
-[Prueba de c.or	11](#heading=h.igdak52iui8h)
-
-[Prueba de c.xor	11](#heading=h.3rj81ua1gkig)
-
-[Prueba de c.slli	11](#heading=h.qyugovrojb8r)
-
-[Prueba de c.srli	12](#heading=h.2dqe5kgtwecy)
-
-[Prueba de c.srai	12](#heading=h.3pb88ca2u47k)
-
-[Prueba de c.lui	13](#heading=h.ovgurrmr8jie)
-
-[**3\. Bibliografía	13**](#3.-bibliografía)
+[**3\. Bibliografía	17**](#3.-bibliografía)
 
 # 
 
@@ -458,19 +438,19 @@ c.add:  a0 = 6 + 2 = 8
 
 La simulación confirma el dinamismo del hardware híbrido al observar la señal PCF, la cual arranca con saltos de 4 bytes (0, 4, 8\) para las instrucciones base de 32 bits y cambia instantáneamente a saltos de 2 bytes (8, a, c, e) al decodificar las instrucciones comprimidas (RVC). A nivel aritmético, la señal ALUResultE demuestra una ejecución matemática exacta y continua: el procesador carga los valores iniciales 5 y 2, los escala a 6 y 8 mediante sumas empaquetadas de 16 bits, alcanza el pico de el valor a (10 en decimal) con una suma de 32 bits, y desciende correctamente a través de restas pasando por 3 y 7 hasta llegar a 4\. El bloque finaliza su ejecución levantando la señal MemWrite a 1 para escribir definitivamente el dato 00000004 como se puede observar en la señal WriteData en y se guarda en  la dirección de memoria 000000c8 como se puede ver en la señal DataAdr.
 
-**Validacion  de Prueba Logica  (c.and, c.or):** 
+### **Validacion  de Prueba Logica  (c.and, c.or):**  {#validacion-de-prueba-logica-(c.and,-c.or):}
 
 ![][image2]
 
 Esta ejecución valida el procesamiento de operaciones lógicas bit a bit en la ALU, intercalando anchos de instrucción de manera fluida. Al analizar la propagación, se observa cómo el código híbrido transiciona sin errores desde la etapa de *Fetch* (InstrF) hacia *Decode* (InstrD). La traza de ALUResultE refleja la evolución de los datos iniciados en f (15) y 6: primero, la compuerta c.and comprimida procesa los bits llevando el resultado temporal a 0, para luego aplicar funciones OR y AND consecutivas operando con los valores f y 7\. El aspecto más destacable de este *waveform* es la intervención de la Unidad de Riesgos mediante las señales ForwardAE y ForwardBE. Debido a la dependencia inmediata de los datos en este bloque tan denso, estas señales se activan (mostrando valores de 1 o 2\) para "adelantar" los resultados recién calculados directamente hacia los multiplexores de la ALU. Esto garantiza que el flujo de ejecución no sufra congelamientos (*stalls*). Además, se verifica cómo el identificador del registro destino viaja protegido a través de la señal RdE, culminando la rutina al transferir el valor final hacia la etapa de memoria (ALUResultM) y almacenando de forma limpia el dato 00000007 como se puede verificar en la señal WriteData. 
 
-**Validación Prueba de Desplazamientos y XOR:**
+### **Validación Prueba de Desplazamientos y XOR:** {#validación-prueba-de-desplazamientos-y-xor:}
 
 ![][image3]
 
 El análisis de este waveform evalúa el rendimiento de los desplazadores bidireccionales y las operaciones exclusivas (XOR) bajo una alta densidad de código. Al rastrear el flujo de las instrucciones desde la etapa de *Fetch* (InstrF) hacia *Decode* (InstrD), la señal ALUResultE captura una intensa manipulación a nivel de bits: tras inicializar los registros en 2 y 3, una compuerta XOR clásica genera un 1, el cual es inmediatamente sometido a un corrimiento lógico a la izquierda de 12 posiciones (c.slli) que dispara el valor a 1000 (4096 en hexadecimal). Posteriormente, los desplazamientos lógicos hacia la derecha (srli y c.srli) reducen drásticamente la cifra, pasando por 400 hasta vaciarla de forma temporal. Debido a la fuerte dependencia de datos encadenados en este bloque, la Unidad de Riesgos interviene de manera agresiva; las señales ForwardAE y ForwardBE registran múltiples activaciones (conmutando entre estados 1 y 2\) para inyectar los valores recién calculados directamente en los multiplexores de la ALU. Este puenteo de hardware (*forwarding*) es tan efectivo que evade por completo la necesidad de congelar el *pipeline* (las señales StallF y StallD se mantienen intactas en 0). Finalmente, el datapath rastrea con éxito los registros destino a través de la señal RdE (alternando entre 0a y 0b), conduciendo el dato final hacia la etapa de memoria (ALUResultM) para concluir la ejecución almacenando de forma impecable el valor 00000001 como se puede ver en la señal WriteData y  en la dirección 000000c8 se guarda correctamente como se puede ver en la señal de DataAdr. 
 
-**Validación Prueba LUI y General:**
+### **Validación Prueba LUI y General:** {#validación-prueba-lui-y-general:}
 
 **![][image4]**
 
