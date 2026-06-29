@@ -77,7 +77,7 @@ Carlos Williams
 
 ## **1.1 Instrucciones Implementadas** {#1.1-instrucciones-implementadas}
 
-La implementación de la extensión  C incluye las instrucciones comprimidas requeridas para ejecutar correctamente los programas de prueba. En el cuadro siguiente se resumen las instrucciones soportadas y su función principal.
+La implementación de la extensión C incluye las instrucciones comprimidas requeridas para ejecutar correctamente los programas de prueba. En el cuadro siguiente se resumen las instrucciones soportadas y su función principal.
 
 | Instrucción | Formato | Operación principal | Uso en el proyecto |
 | :---- | :---- | :---- | :---- |
