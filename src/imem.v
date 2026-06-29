@@ -12,7 +12,7 @@ module imem(
         end
         
         // Cargar el archivo maestro de pruebas
-        $readmemh("matrix_rv32i.mem", RAM);
+        $readmemh("test.mem", RAM);
     end
     
     wire [29:0] word_addr = a[31:2]; 
