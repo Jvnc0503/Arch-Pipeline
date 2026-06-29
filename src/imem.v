@@ -12,7 +12,7 @@ module imem(
         end
         
         // Cargar el archivo maestro de pruebas
-        $readmemh("cswsp-clwsp.mem", RAM);
+        $readmemh("csw-clw.mem", RAM);
     end
     
     wire [29:0] word_addr = a[31:2]; 
