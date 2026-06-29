@@ -36,26 +36,85 @@ Waveforms
 Mostrar y explicar cómo el Hazard unit soluciona los
 problemas de dependencia de sus programas de prueba.
 
-E2 Entregables (4 pts):  Código de la primera parte de las instrucciones atómicas
-                           Test de prueba de las instrucciones
-    Informe: Breve resumen de la teoría
-      Descripción de partes importantes del código
-                  Pruebas, waveforms y discusión de resultados
-|     |                    |     |
-| --- | ------------------ | --- |
+E2 Entregables (4 pts): Parte 1: c.addi, c.add, c.sub, c.and, c.or, c.xor, c.slli,
+c.srli, c.srai, c.lui
+Código de la primera parte de las instrucciones comprimidas
+Test de prueba de las instrucciones
+Informe:
+Implementación de instrucciones 2.0 pts
+Explicar cómo funcionará cada nueva instrucción 1.5 pts
+Código para cada instrucción explicado
+Cambios extras en el datapath para adaptación 0.5 pts
+Código de los cambios
+Resultados: 2.0 pts
+Programa ISA test ( que incluya instrucciones de 32 y 16 bits ) de
+las instrucciones 0.5 pts
+Waveform de todas/ importantes las instrucciones de su programa
+explicadas 1.5 pts
+*Mostrar con resultados que el programa funciona correctamente
+E3 Entregables (3 pts): Parte 2: c.lw, c.sw, c.lwsp, c.swsp, c.beqz, c.bnez, c.j,
+c.jal, c.jr, c.jalr
+Código de la segunda parte de las instrucciones comprimidas
+Test de prueba de las instrucciones
+Informe:
+Implementación de instrucciones 1.0 pts
+Explicar cómo funcionará cada nueva instrucción 0.5 pts
+Código para cada instrucción explicado
+Cambios extras en el datapath para adaptación 0.25 pts
+Código de los cambios
+Encoding de todas las instrucciones pt1 y pt2 0.25 pts
+Resultados: 2.0 pts
+Programa ISA - algoritmo ( que incluya instrucciones de 32 y 16
+bits ) de las instrucciones 0.5 pts
+Waveform de todas/ importantes las instrucciones explicadas 1 pts
+*Mostrar con resultados que el programa funciona correctamente
+Comparativas entre los tamaños resultantes de los
+programas y el performance 0.5 pts
+Entrega 3: Sec 1, 2 Lunes 29/06 - Sec 3,4 Martes 30/06
 
-EF Entregables (3 pts): Informe y Código completo
-    Código de  las instrucciones atómicas completas
-                           Test de prueba de las instrucciones
-    Informe: Breve resumen de la teoría
-      Descripción de partes importantes del código
-                  Pruebas, waveforms y discusión de resultados
-                  Programa ISA y Análisis de performance
-                  Conclusiones
-| Presentación Final (8 pts):   |     | Presentación final ( 5 pts) 15min                   |
-| ----------------------------- | --- | --------------------------------------------------- |
-|                               |     | Preguntas grupal e individual ( 1 pts + 2pts) 5min  |
-        Asistir a su horario correspondiente. Solo el grupo que le toca
-|     |      | exponer estará en sala.  |
-| --- | ---- | ------------------------ |
-|     |      |                          |
+| Presentación Final (8 pts):   |     | Presentación final ( 5 pts) 15 min  |     |     |     |
+| ----------------------------- | --- | ----------------------------------- | --- | --- | --- |
+          Explicación Pipeline funcionando con Hazard unit 0.5 pts
+|     |     |     Explicación implementación instrucciones c 2 pts  |     |     |     |
+| --- | --- | ----------------------------------------------------- | --- | --- | --- |
+Explicación instrucciones importantes
+|     |     |                                                       | Módulos agregados, cambios en el datapath   |     |     |
+| --- | --- | ----------------------------------------------------- | ------------------------------------------- | --- | --- |
+|     |     |                                                       | Encoding                                    |     |     |
+|     |     |                                                       | Limitaciones                                |     |     |
+|     |     |     Test programa ISA-algoritmo de prueba 2 pts       |                                             |     |     |
+|     |     |                                                       | Explicación de resultados                   |     |     |
+|     |     |                                                       | Comparativa tamaño y performance            |     |     |
+|     |     |     Conclusiones, desafíos y mejoras 0.5 pts          |                                             |     |     |
+|     |     |   Preguntas grupal e individual ( 1 pts + 2pts) 5min  |                                             |     |     |
+|     |     |   Asistir sólo a su horario correspondiente :         |                                             |     |     |
+
+| Grupo Sec 1  | Martes 30  |         | Grupo Sec 1  | Miércoles 01  |        |
+| ------------ | ---------- | ------- | ------------ | ------------- | ------ |
+|              | 1          | 15:15   |              | 5             | 12:00  |
+|              | 2          | 15:40   |              | 8             | 12:25  |
+|              | 3          | 16:05   |              | 4             | 12:50  |
+|              | 9          | 16:30   |              | 6             | 13:15  |
+|              |            |         |              | 7             | 13:40  |
+| Grupo Sec 2  | Martes 30  |         |              |               |        |
+|              | 3          | 17:00   | Grupo Sec 2  | Miércoles 01  |        |
+|              | 4          | 17:25   |              | 1             | 15:15  |
+|              | 2          | 17:50   |              | 7             | 15:40  |
+|              | 5          | 17:15   |              |               |        |
+|              | 6          | 17:40   | Grupo Sec 3  | Miércoles 01  |        |
+|              |            |         |              | 3             | 17:00  |
+|              |            |         |              | 2             | 17:25  |
+
+| Grupo Sec 3  | Jueves 02  |         | Grupo Sec 4  | Viernes 03  |        |
+| ------------ | ---------- | ------- | ------------ | ----------- | ------ |
+|              | 5          | 12:00   |              | 5           | 12:15  |
+|              | 7          | 12:25   |              | 6           | 12:40  |
+|              | 1          | 12:50   |              | 8           | 13:05  |
+|              | 6          | 13:15   |              | 4           | 13:30  |
+|              | 4          | 13:40   |              |             |        |
+|              |            |         |              |             |        |
+| Grupo Sec 4  | Jueves 2   |         |              |             |        |
+|              | 2          | 14:15   |              |             |        |
+|              | 1          | 14:40   |              |             |        |
+|              | 3          | 15:05   |              |             |        |
+|              | 7          | 15:30   |              |             |        |
