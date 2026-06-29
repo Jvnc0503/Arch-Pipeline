@@ -1,0 +1,6 @@
+00000513  // 0x00: addi a0, x0, 0 (32-bit)
+0513C119  // 0x04: Mitad inf 'addi a0,x0,99' (Flush) [0513] | c.beqz a0, +6 [C119]
+05130630  // 0x08: Mitad inf 'addi a0,a0,1' [0513] | Mitad sup 'addi a0,x0,99' [0630]
+E1190015  // 0x0C: c.bnez a0, +6 [E119] | Mitad sup 'addi a0,a0,1' [0015]
+06300513  // 0x10: addi a0, x0, 99 (32-bit, Flush)
+00150593  // 0x14: addi a1, a0, 1  (32-bit)

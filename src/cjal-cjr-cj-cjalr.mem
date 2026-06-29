@@ -1,0 +1,4 @@
+A0212011  // 0x00: c.j fin [A021] | c.jal subrutina [2011]
+00500513  // 0x04: addi a0, x0, 5 (32-bit)
+05938082  // 0x08: Mitad inferior de 'addi a1, a0, 5' [0593] | c.jr ra [8082] 
+00010055  // 0x0C: c.nop (Relleno) [0001] | Mitad superior de 'addi a1, a0, 5' [0055]

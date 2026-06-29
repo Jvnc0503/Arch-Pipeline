@@ -1,0 +1,4 @@
+10000113  // 0x00: addi sp, x0, 256  (32-bit)
+02A00513  // 0x04: addi a0, x0, 42   (32-bit)
+4582C02A  // 0x08: c.lwsp a1, 0(sp) [4582] | c.swsp a0, 0(sp) [C02A] (Empaquetadas)
+00B50633  // 0x0C: add a2, a0, a1    (32-bit)
