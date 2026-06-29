@@ -1,6 +1,0 @@
-45254521 // [c.li a0, 8]     | [c.li a0, 9]    -> Carga de valores desordenados
-46194595 // [c.li a1, 5]     | [c.li a1, 6]
-8d2d850a // [c.mv a0, sp]    | [c.xor a0, a1]  -> Comparaciones de registros comprimidos
-89098d09 // [c.sub a0, a1]   | [c.andi a0, 2]  -> Verificación del pivote del ordenamiento
-0001c185 // [c.beqz a1, +2]  | [c.nop]         -> Salto condicional ante pivote correcto
-0ca02423 // sw a0, 200(x0)                     -> GUARDA Y TERMINA
