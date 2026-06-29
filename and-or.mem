@@ -1,8 +1,0 @@
-00f00513 // addi a0, x0, 15   -> [32 bits] a0 = 15 (Binario: 01111)
-00600593 // addi a1, x0, 6    -> [32 bits] a1 = 6  (Binario: 00110)
-8d6d0505 // [c.and a0, a1] | [c.addi a0, 1] - c.addi: a0 = 15 + 1 = 16 // c.and: a0 = 16 & 6 = 0
-00f00513 // addi a0, x0, 15 - a0 = 15
-8d4d0585 // [c.or a0, a1]  | [c.addi a1, 1] - c.addi: a1 = 6 + 1 = 7 // c.or: a0 = 15 | 7 = 15
-00b57533 // and a0, a0, a1  - a0 = 15 & 7 = 7 
-0ca02423 // sw a0, 200(x0)  - guardar el 7
-0000006f // jal x0, 0 
