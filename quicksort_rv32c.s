@@ -44,31 +44,33 @@ quicksort:
     bge  a1, a2, quicksort_end
     
     # Push (Uso agresivo de c.swsp reduce a la mitad el tamaño del push)
-    addi sp, sp, -16
-    c.swsp ra, 12(sp)
-    c.swsp a0, 8(sp)
-    c.swsp a1, 4(sp)
-    c.swsp a2, 0(sp)
+    addi sp, sp, -20
+    c.swsp ra, 16(sp)
+    c.swsp a0, 12(sp)
+    c.swsp a1, 8(sp)
+    c.swsp a2, 4(sp)
 
     c.jal partition
+    c.swsp a3, 0(sp)
 
     # Recursividad Izquierda
-    c.lwsp a0, 8(sp)
-    c.lwsp a1, 4(sp)
+    c.lwsp a0, 12(sp)
+    c.lwsp a1, 8(sp)
     add  a2, x0, a3
-    c.addi a2, -1         # c.addi (16-bits)
+    c.addi a2, -1         
     c.jal quicksort
 
     # Recursividad Derecha
-    c.lwsp a0, 8(sp)
+    c.lwsp a0, 12(sp)
+    c.lwsp a3, 0(sp)
     add  a1, x0, a3
     c.addi a1, 1
-    c.lwsp a2, 0(sp)
+    c.lwsp a2, 4(sp)
     c.jal quicksort
 
     # Pop
-    c.lwsp ra, 12(sp)
-    addi sp, sp, 16
+    c.lwsp ra, 16(sp)
+    addi sp, sp, 20
 quicksort_end:
     c.jr ra               # c.jr (16-bits)
 

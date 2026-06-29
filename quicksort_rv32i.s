@@ -45,30 +45,32 @@ quicksort:
     bge  a1, a2, quicksort_end
     
     # Push al Stack
-    addi sp, sp, -16
-    sw   ra, 12(sp)
-    sw   a0, 8(sp)
-    sw   a1, 4(sp)
-    sw   a2, 0(sp)
+    addi sp, sp, -20
+    sw   ra, 16(sp)
+    sw   a0, 12(sp)
+    sw   a1, 8(sp)
+    sw   a2, 4(sp)
 
     # Partition
     jal  ra, partition
+    sw   a3, 0(sp)
 
     # Llamada Recursiva Izquierda (low a pi - 1)
-    lw   a0, 8(sp)
-    lw   a1, 4(sp)
+    lw   a0, 12(sp)
+    lw   a1, 8(sp)
     addi a2, a3, -1
     jal  ra, quicksort
 
     # Llamada Recursiva Derecha (pi + 1 a high)
-    lw   a0, 8(sp)
+    lw   a0, 12(sp)
+    lw   a3, 0(sp)
     addi a1, a3, 1
-    lw   a2, 0(sp)
+    lw   a2, 4(sp)
     jal  ra, quicksort
 
     # Pop del Stack
-    lw   ra, 12(sp)
-    addi sp, sp, 16
+    lw   ra, 16(sp)
+    addi sp, sp, 20
 quicksort_end:
     jalr x0, ra, 0
 
