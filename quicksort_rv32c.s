@@ -2,7 +2,7 @@
 # 1. INICIALIZACIÓN (Usando c.sw con base a0 y temp s0)
 # =====================================================================
 add  a0, x0, x0       # a0 = 0 (Registro C compatible)
-addi s0, x0, 9
+addi s0, x0, 8
 c.sw s0, 0(a0)        # arr[0] = 9 (Instrucción de 16-bits)
 addi s0, x0, 3
 c.sw s0, 4(a0)
