@@ -1,0 +1,78 @@
+Prueba 1 (c.swsp y c.lwsp):
+
+addi sp, x0, 256      # Configura el stack pointer en la dirección 256
+addi a0, x0, 42       # Carga el dato '42' en a0 (x10)
+c.swsp a0, 0(sp)      # Guarda a0 en mem[sp]. (Equivalente: sw a0, 0(sp))
+c.lwsp a1, 0(sp)      # Carga desde mem[sp] a a1 (x11). (Equivalente: lw a1, 0(sp))
+add a2, a0, a1        # a2 = 84. Debe activar el Forwarding Unit desde la etapa MEM/WB hacia EX.
+
+10000113  // 0x00: addi sp, x0, 256  (32-bit)
+02A00513  // 0x04: addi a0, x0, 42   (32-bit)
+4582C02A  // 0x08: c.lwsp a1, 0(sp) [4582] | c.swsp a0, 0(sp) [C02A] (Empaquetadas)
+00B50633  // 0x0C: add a2, a0, a1    (32-bit)
+
+Objetivo en el Waveform: 
+Demostrar que el descompresor expande correctamente estas instrucciones asumiendo siempre rs1 = x2. También debes vigilar que el PC avance +4 en los addi y +2 en los c.swsp/c.lwsp.  
+
+Prueba 2 (c.sw y c.lw):
+
+addi a0, x0, 100      # Puntero base en a0 (x10, registro válido para RVC)
+addi a1, x0, 77       # Dato a guardar en a1 (x11)
+c.sw a1, 0(a0)        # Guarda a1 en mem[a0]
+c.lw a2, 0(a0)        # Carga desde mem[a0] a a2 (x12)
+sub a3, a2, a1        # a3 = 0. Verifica que el PC tras el c.lw (16-bit) leyó correctamente esta de 32-bit.
+
+06400513  // 0x00: addi a0, x0, 100  (32-bit)
+04D00593  // 0x04: addi a1, x0, 77   (32-bit)
+4210C21C  // 0x08: c.lw a2, 0(a0) [4210] | c.sw a1, 0(a0) [C21C] (Empaquetadas)
+40B606B3  // 0x0C: sub a3, a2, a1    (32-bit)
+
+Objetivo en el Waveform: Confirmar que el decodificador mapea correctamente los bits reducidos de los registros (ej. 000 = x8, 010 = x10).
+
+Prueba 3 (c.jal, c.jr, c.j y c.jalr)
+
+main:
+    c.jal subrutina   # Salta a 'subrutina', guarda el PC+2 de retorno en ra (x1)
+    c.j fin           # Salto incondicional para evitar la subrutina si falla el c.jr
+
+subrutina:
+    addi a0, x0, 5    # Operación dummy dentro de la subrutina
+    c.jr ra           # Salta al valor guardado en 'ra' (retorna al c.j fin)
+
+fin:
+    addi a1, a0, 5    # a1 = 10
+
+A0212011  // 0x00: c.j fin [A021] | c.jal subrutina [2011]
+00500513  // 0x04: addi a0, x0, 5 (32-bit)
+05938082  // 0x08: Mitad inferior de 'addi a1, a0, 5' [0593] | c.jr ra [8082] 
+00010055  // 0x0C: c.nop (Relleno) [0001] | Mitad superior de 'addi a1, a0, 5' [0055]
+
+Objetivo en el Waveform: Mostrar el Flush en tu pipeline y que el PC salte a direcciones desalineadas (alineadas a medias palabras o 2 bytes).
+
+Prueba 4 (c.beqz y c.bnez):
+
+# Setup
+addi a0, x0, 0        # a0 = 0
+
+# Prueba Branch if Zero
+c.beqz a0, es_cero    # Como a0 == 0, DEBE saltar.
+addi a0, x0, 99       # HAZARD FLUSH: Esta línea debe ser anulada en el pipeline.
+
+es_cero:
+addi a0, a0, 1        # a0 = 1
+
+# Prueba Branch if Not Zero
+c.bnez a0, fin        # Como a0 != 0 (es 1), DEBE saltar.
+addi a0, x0, 99       # HAZARD FLUSH: Esta línea también debe anularse.
+
+fin:
+addi a1, a0, 1        # a1 = 2
+
+00000513  // 0x00: addi a0, x0, 0 (32-bit)
+0513C119  // 0x04: Mitad inf 'addi a0,x0,99' (Flush) [0513] | c.beqz a0, +6 [C119]
+05130630  // 0x08: Mitad inf 'addi a0,a0,1' [0513] | Mitad sup 'addi a0,x0,99' [0630]
+E1190015  // 0x0C: c.bnez a0, +6 [E119] | Mitad sup 'addi a0,a0,1' [0015]
+06300513  // 0x10: addi a0, x0, 99 (32-bit, Flush)
+00150593  // 0x14: addi a1, a0, 1  (32-bit)
+
+Objetivo en el Waveform: Ver cómo el descompresor expande esto inyectando el registro x0 físicamente en el datapath para que la ALU o el comparador haga su trabajo.

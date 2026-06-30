@@ -1,0 +1,5 @@
+// Prueba 2 (c.sw y c.lw):
+06400513  // 0x00: addi a0, x0, 100  (32-bit)
+04D00593  // 0x04: addi a1, x0, 77   (32-bit)
+4210C21C  // 0x08: c.lw a2, 0(a0) [4210] | c.sw a1, 0(a0) [C21C] (Empaquetadas)
+40B606B3  // 0x0C: sub a3, a2, a1    (32-bit)
