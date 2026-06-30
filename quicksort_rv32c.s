@@ -4,13 +4,13 @@
 add  a0, x0, x0       # a0 = 0 (Registro C compatible)
 addi s0, x0, 9
 c.sw s0, 0(a0)        # arr[0] = 9 (Instrucción de 16-bits)
-addi s0, x0, 4
+addi s0, x0, 3
 c.sw s0, 4(a0)
-addi s0, x0, 7
+addi s0, x0, 6
 c.sw s0, 8(a0)
-addi s0, x0, 2
+addi s0, x0, 1
 c.sw s0, 12(a0)
-addi s0, x0, 8
+addi s0, x0, 7
 c.sw s0, 16(a0)
 
 # =====================================================================
